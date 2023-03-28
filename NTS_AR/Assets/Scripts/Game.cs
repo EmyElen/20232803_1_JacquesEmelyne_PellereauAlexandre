@@ -16,7 +16,7 @@ public class  Game : MonoBehaviour
     //particleEffect to instantiate when a GameObject is destroyed
     public GameObject particleEffect;
 
-    [SerializeField] private Text chrono;
+    public Text chrono;
     private float timer = 60f;
     
     private RaycastHit hit;
@@ -32,7 +32,8 @@ public class  Game : MonoBehaviour
     public Text countText;
     public int _cubeCount;
 
-    private Touch generateTouch;
+    private Vector2 TouchPosition;
+    private ARRaycastHit firstHit ;
 
 
     
@@ -40,12 +41,14 @@ public class  Game : MonoBehaviour
     private void OnTouch()
     {
         isTouched = true;
-        generateTouch = Input.GetTouch(0);
+        Touch touch = Input.GetTouch(0);
+        TouchPosition = touch.position;
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        raycastManager.Raycast(generateTouch.position, hits, typeToTrack);
+        raycastManager.Raycast(TouchPosition, hits, typeToTrack);
         
         if (hits.Count > 0)
         {
+            firstHit = hits[0];
             Spawn();
         }
         
@@ -97,26 +100,20 @@ public class  Game : MonoBehaviour
         if (timer < 0)
         {
             EndGame();
+            return;
         }
-
-        Touch touch = generateTouch;
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        raycastManager.Raycast(touch.position, hits, typeToTrack);
         
-        if (hits.Count > 0)
-        {
-            ARRaycastHit firstHit = hits[0];
-            Vector3 pos = firstHit.pose.position;
+        Vector3 pos = firstHit.pose.position;
 
-            pos.x += Random.Range(-0.2f, 0.2f);
-            pos.y += 0.1f;
-            pos.z += Random.Range(-0.2f, 0.2f);
-            
-            GameObject cube = Instantiate(EnemyPrefab, pos, firstHit.pose.rotation);
-            int randomIndex = Random.Range(0, materials.Count);
-            Material randomMaterial = materials[randomIndex];
-            cube.GetComponent<MeshRenderer>().material = randomMaterial;
-        }
+        pos.x += Random.Range(-0.2f, 0.2f);
+        pos.y += 0.1f;
+        pos.z += Random.Range(-0.2f, 0.2f);
+        
+        GameObject cube = Instantiate(EnemyPrefab, pos, firstHit.pose.rotation);
+        int randomIndex = Random.Range(0, materials.Count);
+        Material randomMaterial = materials[randomIndex];
+        cube.GetComponent<MeshRenderer>().material = randomMaterial;
+        
         Invoke("Spawn",1);
 
         
@@ -139,7 +136,7 @@ public class  Game : MonoBehaviour
             {
                 var clone = Instantiate(particleEffect, hitObj.transform.position, Quaternion.identity);
                 clone.transform.localScale = hitObj.transform.localScale;
-                _cubeCount++;
+                _cubeCount += 1;
                 countText.text = "Enemy killed " + _cubeCount;
                 Destroy(hitObj);
                 
