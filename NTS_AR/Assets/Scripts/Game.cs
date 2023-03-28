@@ -11,13 +11,15 @@ public class  Game : MonoBehaviour
 
     public GameObject EnemyPrefab;
     private bool isTouched = false;
+
+    private bool isDestroyed = false;
     
     
     //particleEffect to instantiate when a GameObject is destroyed
     public GameObject particleEffect;
 
     public Text chrono;
-    private float timer = 60f;
+    private float timer = 45f;
     
     private RaycastHit hit;
     private Camera cam;
@@ -30,7 +32,7 @@ public class  Game : MonoBehaviour
     public TrackableType typeToTrack = TrackableType.PlaneWithinBounds;
     public List<Material> materials = new List<Material>();
     public Text countText;
-    public int _cubeCount;
+    private int _cubeCount;
 
     private Vector2 TouchPosition;
     private ARRaycastHit firstHit ;
@@ -71,6 +73,12 @@ public class  Game : MonoBehaviour
     {
         timer -= Time.deltaTime;
         chrono.text = "Timer :" + timer;
+        if (isDestroyed)
+        {
+            _cubeCount += 1;
+            countText.text = "Enemy killed " + _cubeCount;
+            isDestroyed = false;
+        }
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -130,14 +138,14 @@ public class  Game : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             GameObject hitObj = hit.collider.gameObject;
-            Material material = hitObj.GetComponent<Material>();
-            particleEffect.GetComponent<MeshRenderer>().material = material;
+            
             if (hitObj.tag == "Enemy")
             {
+                isDestroyed = true;
+                Material material = hitObj.GetComponent<MeshRenderer>().material;
+                particleEffect.GetComponent<MeshRenderer>().material = material;
                 var clone = Instantiate(particleEffect, hitObj.transform.position, Quaternion.identity);
                 clone.transform.localScale = hitObj.transform.localScale;
-                _cubeCount += 1;
-                countText.text = "Enemy killed " + _cubeCount;
                 Destroy(hitObj);
                 
             }
