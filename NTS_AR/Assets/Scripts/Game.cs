@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.UI;
 
-public class Game : MonoBehaviour
+public class  Game : MonoBehaviour
 {
 
     public GameObject EnemyPrefab;
@@ -16,28 +17,32 @@ public class Game : MonoBehaviour
     public GameObject particleEffect;
 
     [SerializeField] private Text chrono;
-    private float timer = 30f;
+    private float timer = 60f;
     
     private RaycastHit hit;
     private Camera cam;
     
+    public Text killed;
+    public GameObject endWindow;
+    
     
     public ARRaycastManager raycastManager;
     public TrackableType typeToTrack = TrackableType.PlaneWithinBounds;
-    private List<GameObject> _instantiatedCubes = new List<GameObject>();
     public List<Material> materials = new List<Material>();
-    [SerializeField] private Text countText;
-    private int _cubeCount;
+    public Text countText;
+    public int _cubeCount;
+
+    private Touch generateTouch;
+
+
     
-    
-   
 
     private void OnTouch()
     {
         isTouched = true;
-        Touch touch = Input.GetTouch(0);
+        generateTouch = Input.GetTouch(0);
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        raycastManager.Raycast(touch.position, hits, typeToTrack);
+        raycastManager.Raycast(generateTouch.position, hits, typeToTrack);
         
         if (hits.Count > 0)
         {
@@ -46,15 +51,7 @@ public class Game : MonoBehaviour
         
         
     }
-
     
-    
-    void InstantiateObject(Vector3 position, Quaternion rotation)
-    {
-        GameObject cube = Instantiate(EnemyPrefab, position, rotation);
-        _instantiatedCubes.Add(cube);
-        
-    }
     
     
     
@@ -99,9 +96,10 @@ public class Game : MonoBehaviour
     {
         if (timer < 0)
         {
-            return;
+            EndGame();
         }
-        Touch touch = Input.GetTouch(0);
+
+        Touch touch = generateTouch;
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
         raycastManager.Raycast(touch.position, hits, typeToTrack);
         
@@ -119,7 +117,7 @@ public class Game : MonoBehaviour
             Material randomMaterial = materials[randomIndex];
             cube.GetComponent<MeshRenderer>().material = randomMaterial;
         }
-        Invoke("Spawn",3);
+        Invoke("Spawn",1);
 
         
     }
@@ -135,20 +133,33 @@ public class Game : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             GameObject hitObj = hit.collider.gameObject;
-            Material material = hitObj.GetComponent<MeshRenderer>().material;
+            Material material = hitObj.GetComponent<Material>();
             particleEffect.GetComponent<MeshRenderer>().material = material;
             if (hitObj.tag == "Enemy")
             {
                 var clone = Instantiate(particleEffect, hitObj.transform.position, Quaternion.identity);
                 clone.transform.localScale = hitObj.transform.localScale;
-                Destroy(hitObj);
                 _cubeCount++;
                 countText.text = "Enemy killed " + _cubeCount;
+                Destroy(hitObj);
+                
             }
         }
     }
     
-   
+    public void PlayAgain()
+    {
+        //endWindow.SetActive(false);
+        SceneManager.LoadScene("Scene1");
+    }
 
-    
+    void EndGame()
+    {
+        endWindow.SetActive(true);
+        killed.text += " " + _cubeCount;
+    }
+
+
+
+
 }
