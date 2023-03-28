@@ -16,6 +16,9 @@ public class Scene2Manager : MonoBehaviour
     public List<Material> materials = new List<Material>();
     [SerializeField] private Text countText;
     private int _cubeCount;
+    
+    
+   
 
     private void OnTouch()
     {
@@ -30,6 +33,9 @@ public class Scene2Manager : MonoBehaviour
             pos.y += 0.1f;
             InstantiateObject(pos, firstHit.pose.rotation);
         }
+
+        
+        
     }
 
     

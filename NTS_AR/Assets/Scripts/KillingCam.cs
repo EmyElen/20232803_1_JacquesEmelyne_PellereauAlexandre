@@ -31,7 +31,14 @@ public class KillingCam : MonoBehaviour
         }
 
         //saving the touch position
-        touchpos = Input.GetTouch(0).position;
+        Touch touch = Input.GetTouch(0);
+        touchpos = touch.position;
+        if (touch.phase != TouchPhase.Began)
+        {
+            
+            return;
+                
+        }
         
         //convert the touch position on the screen to a ray from the camera
         Ray ray = cam.ScreenPointToRay(touchpos);

@@ -322,6 +322,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 680e100a871c68d478eec3a977b37f93, type: 2}
   - {fileID: 2100000, guid: 0d3282e4a4c9f9643b76c7f0d8f5f29f, type: 2}
   countText: {fileID: 594994962}
+  particleEffect: {fileID: 1132169901178195812, guid: 1f5910c19b94fbd4798d0a4474874e00,
+    type: 3}
 --- !u!4 &990232550
 Transform:
   m_ObjectHideFlags: 0
