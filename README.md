@@ -1,3 +1,5 @@
-# TP_NTS_AR_VR
+## TP_NTS_AR_VR
 
-Le .gitignore est dans /NTS-AR
+Le but du jeu est de cliquer sur tout les cubes avant la fin du timer.
+
+PS : Le .gitignore est dans /NTS-AR
